@@ -12,10 +12,9 @@ app.post("/signup",async (req,res)=>{
         res.send("User Added Successfully");
     }
     catch(err){
-        res.status(400).send("Erroe saving the user:",err.message);
+        res.status(400).send("Erroe saving the user: "+err.message);
     }
 })
-//fetch the data from database
 app.get("/user",async (req,res)=>{
     const userEmail=req.body.emailId;
     try{
@@ -32,7 +31,6 @@ app.get("/user",async (req,res)=>{
 
     }
 })
-
 app.get("/feed",async (req,res)=>{
     try{
         const users=await User.find({});
@@ -61,16 +59,32 @@ app.delete("/user",async (req,res)=>{
     //     }
 
 })
-app.patch("/user",async (req,res)=>{
-    const userId=req.body.userId;
+app.patch("/user/:userId",async (req,res)=>{
+    const userId=req.params?.userId;
     const data=req.body;
     console.log(data);
     try{
-        await User.findByIdAndUpdate({_id: userId},data);
+        const ALLOWED_UPDATES=[
+            "password",
+            "age",
+            "gender",
+            "occupation"
+        ];
+        const isUpdateAllowed = Object.keys(data).every((k)=>
+            ALLOWED_UPDATES.includes(k)
+        );
+        if(!isUpdateAllowed){
+            throw new Error("Update not allowed");
+        }
+        await User.findOneAndUpdate(
+            {_id:userId},
+            data,
+            {runValidators:true}
+        );
         res.send("User updated successfully");
     }
     catch(err){
-        res.status(400).send("Something went wrong")
+        res.status(400).send("Something went wrong "+err.message);
     }
 
 })
