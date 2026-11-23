@@ -18,7 +18,8 @@ profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
             throw new Error("Permission Denied to edit this change");
         }
         const logedInUser = req.user;
-        Object.keys(req.body).forEach((key) =>( logedInUser[key] = req.body[key]));
+        Object.keys(req.body).forEach((key) =>(logedInUser[key] = req.body[key]));
+        await logedInUser.save();
         res.send("edit successfullly");
     }
     catch(err){
