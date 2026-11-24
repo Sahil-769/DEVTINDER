@@ -56,10 +56,9 @@ const userSchema = new Schema({
     },
     gender: {
         type: String,
-        validator(value) {
-            if (!["Male", "Female", "Other"].includes(value)) {
-                throw new Error("Gender is invalid");
-            }
+        enum:{
+            values:["Male","Female","other"],
+            meaasge:` {VALUE} is not a valid gender type `
         }
     },
     occupation: {
@@ -72,6 +71,9 @@ const userSchema = new Schema({
         timestamps: true,
     }
 );
+
+userSchema.index({firstName: 1, lastName: 1});
+
 userSchema.methods.getJWT = async function () {
     const user = this;
     const token = await jwt.sign({ _id: user._id }, "SAHIL@769", { expiresIn: "7d", });
