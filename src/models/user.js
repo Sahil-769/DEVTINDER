@@ -56,14 +56,24 @@ const userSchema = new Schema({
     },
     gender: {
         type: String,
-        enum:{
-            values:["Male","Female","other"],
-            meaasge:` {VALUE} is not a valid gender type `
+        enum: {
+            values: ["Male", "Female", "other"],
+            meaasge: ` {VALUE} is not a valid gender type `
         }
     },
     occupation: {
         type: String,
         required: true
+    },
+    status: {
+        type: String,
+        enum: ['active', 'inactive', 'blocked'],
+        default: 'inactive',
+        required: true
+    },
+    isActive: {
+        type: Boolean,
+        default: false
     }
 
 },
@@ -72,17 +82,17 @@ const userSchema = new Schema({
     }
 );
 
-userSchema.index({firstName: 1, lastName: 1});
+userSchema.index({ firstName: 1, lastName: 1 });
 
 userSchema.methods.getJWT = async function () {
     const user = this;
     const token = await jwt.sign({ _id: user._id }, "SAHIL@769", { expiresIn: "7d", });
     return token;
 }
-userSchema.methods.checkPassword = async function (passwordInputByUser){
+userSchema.methods.checkPassword = async function (passwordInputByUser) {
     const user = this;
     const isPasswordValid = await bcrypt.compare(passwordInputByUser, user.password);
-    if(isPasswordValid){
+    if (isPasswordValid) {
         return true;
     }
 }
